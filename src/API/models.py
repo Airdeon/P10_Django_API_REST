@@ -7,6 +7,7 @@ class Projects(models.Model):
     description = models.CharField(max_length=2000, verbose_name="Description")
     type = models.CharField(max_length=255, verbose_name="Type")
     author = models.ForeignKey(User, on_delete=models.CASCADE, null=True, verbose_name="Auteur")
+    contributor = models.ManyToManyField(User, verbose_name="Contributeur")
 
 
 class Issues(models.Models):

@@ -7,13 +7,13 @@ class Projects(models.Model):
     description = models.CharField(max_length=2000, verbose_name="Description")
     type = models.CharField(max_length=255, verbose_name="Type")
     author = models.ForeignKey(User, on_delete=models.CASCADE, null=True, verbose_name="Auteur")
-    contributor = models.ManyToManyField(User, verbose_name="Contributeur")
+    contributor = models.ManyToManyField(User, related_name="project_contributor", verbose_name="Contributeur")
 
 
-class Issues(models.Models):
+class Issues(models.Model):
     project = models.ForeignKey(Projects, on_delete=models.CASCADE, null=True, verbose_name="Projet")
     author = models.ForeignKey(User, on_delete=models.CASCADE, null=True, verbose_name="Auteur")
-    contributor = models.ManyToManyField(User, verbose_name="Contributeur")
+    contributor = models.ManyToManyField(User, related_name="issue_contributor", verbose_name="Contributeur")
     title = models.CharField(max_length=255, verbose_name="Titre")
     description = models.CharField(max_length=2000, verbose_name="Description")
     tag = models.CharField(max_length=50, verbose_name="Tag")
@@ -22,7 +22,7 @@ class Issues(models.Models):
     created_time = models.DateTimeField(auto_now_add=True, verbose_name="Date de création")
 
 
-class Comments(models.Models):
+class Comments(models.Model):
     issue = models.ForeignKey(Issues, on_delete=models.CASCADE, null=True, verbose_name="Probleme")
     author = models.ForeignKey(User, on_delete=models.CASCADE, null=True, verbose_name="Auteur")
     description = models.CharField(max_length=2000, verbose_name="Description")

@@ -3,7 +3,7 @@ from .models import Projects, Issues, Comments
 
 
 class ProjectsSerializer(serializers.ModelSerializer):
-    author = serializers.StringRelatedField()
+    author = serializers.StringRelatedField(many=True)
     contributor = serializers.StringRelatedField(many=True)
 
     class Meta:

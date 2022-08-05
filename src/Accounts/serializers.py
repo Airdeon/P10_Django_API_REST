@@ -1,14 +1,16 @@
 from django.contrib.auth import update_session_auth_hash
 from rest_framework import serializers
 from django.contrib.auth.models import User
+from django.contrib.auth.hashers import make_password
 
 
 class UserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=False)
-
     class Meta:
         model = User
-        fields = ("id", "username", "email", "profile", "password")
+        fields = ("id", "username", "password")
 
-    def create(self, validated_data):
-        return User.objects.create(request_data=validated_data)
+    def validate_password(self, value):
+        if len(value) > 4:
+            return make_password(value)
+        else:
+            raise serializers.ValidationError("Mot de passe trop court, minimum 5 caractères")

@@ -1,10 +1,11 @@
 from rest_framework import serializers
 from .models import Projects, Issues, Comments
+from Accounts.serializers import UserSerializer
 
 
 class ProjectsSerializer(serializers.ModelSerializer):
-    author = serializers.StringRelatedField(many=True)
-    contributor = serializers.StringRelatedField(many=True)
+    author = UserSerializer()
+    contributor = UserSerializer(many=True)
 
     class Meta:
         model = Projects
@@ -16,6 +17,11 @@ class ProjectsSerializer(serializers.ModelSerializer):
             "author",
             "contributor",
         ]
+        # read_only_fields = ["author"]
+
+    def validate(self, data, **kwargs):
+        data["author"] = self.context["author"]
+        return data
 
 
 class IssuesSerializer(serializers.ModelSerializer):

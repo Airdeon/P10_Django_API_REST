@@ -16,15 +16,16 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
-from API.views import ViewSetProjects
+from API.views import ProjectsViewSet
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from Accounts.views import Signup
+from Accounts.views import Signup, UserViewSet
 
 # API URL
 router = routers.SimpleRouter()
 
 # router.register("signup", ViewSetSignup, basename="signup")
-# router.register("projects", ViewSetProjects, basename="projects")
+router.register("projects", ProjectsViewSet, basename="projects")
+# router.register("projects/pk/users/", UserViewSet, basename="projects_user")
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -33,5 +34,4 @@ urlpatterns = [
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("api/", include(router.urls)),
     path("signup/", Signup.as_view(), name="signup"),
-    path("api/projects/", ViewSetProjects.as_view(), name="projects"),
 ]

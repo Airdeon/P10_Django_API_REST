@@ -26,10 +26,9 @@ router = routers.SimpleRouter()
 
 # router.register("signup", ViewSetSignup, basename="signup")
 router.register(r"projects", ProjectsViewSet, basename="projects")
-# router.register("projects/<int:project_id>/users/", UserViewSet, basename="projects_user")
 
 domains_router = routers.NestedSimpleRouter(router, r"projects", lookup="projects")
-domains_router.register(r"users", UserViewSet, basename="domain-nameservers")
+domains_router.register(r"users", UserViewSet, basename="project-users")
 
 urlpatterns = [
     path("admin/", admin.site.urls),

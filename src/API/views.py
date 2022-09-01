@@ -8,6 +8,9 @@ from rest_framework.permissions import IsAuthenticated
 
 from django.db.models import Q
 
+from rest_framework.response import Response
+from rest_framework import status
+
 
 # Create your views here.
 class ProjectsViewSet(ModelViewSet):
@@ -17,8 +20,10 @@ class ProjectsViewSet(ModelViewSet):
 
     def get_queryset(self):
         print(self.kwargs)
+
         if "pk" in self.kwargs:
-            return Projects.objects.filter(id=self.kwargs["pk"])
+            print(int(self.kwargs["pk"]))
+            return Projects.objects.filter(id=int(self.kwargs["pk"]))
         else:
             print(self.request.user)
             return Projects.objects.filter(Q(author=self.request.user) | Q(contributor__in=[self.request.user]))
@@ -26,4 +31,25 @@ class ProjectsViewSet(ModelViewSet):
     def get_serializer_context(self):
         context = super(ProjectsViewSet, self).get_serializer_context()
         context.update({"author": self.request.user})
+        return context
+
+
+class IssuesViewSet(ModelViewSet):
+    serializer_class = IssuesSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        print(self.kwargs)
+
+        if "pk" in self.kwargs:
+            print(int(self.kwargs["pk"]))
+            return Issues.objects.filter(id=int(self.kwargs["pk"]))
+        else:
+            print(self.request.user)
+            return Issues.objects.filter(project=Projects.objects.get(id=int(self.kwargs["projects_pk"])))
+
+    def get_serializer_context(self):
+        context = super(ProjectsViewSet, self).get_serializer_context()
+        context.update({"author": self.request.user})
+        context.update({"project": Projects.objects.get(id=int(self.kwargs["projects_pk"]))})
         return context

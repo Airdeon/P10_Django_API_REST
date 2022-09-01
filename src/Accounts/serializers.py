@@ -18,8 +18,8 @@ class UserSignupSerializer(serializers.ModelSerializer):
 
 
 class ProjectUserSerializer(serializers.ModelSerializer):
-    contributor = serializers.StringRelatedField(many=True)
+    # contributor = serializers.StringRelatedField(many=True)
 
     class Meta:
-        model = Projects
-        fields = ("contributor",)
+        model = User
+        fields = ("username",)

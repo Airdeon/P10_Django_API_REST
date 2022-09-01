@@ -22,8 +22,10 @@ class UserViewSet(ModelViewSet):
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
-        print(Projects.objects.get(id=self.kwargs["projects_pk"]).contributor)
-        return Projects.objects.get(id=self.kwargs["projects_pk"]).contributor
+        print("test0")
+        print(Projects.objects.get(id=self.kwargs["projects_pk"]).contributor.all())
+        print("test1")
+        return Projects.objects.get(id=self.kwargs["projects_pk"]).contributor.all()
 
     def create(self, request, *args, **kwargs):
         data = request.data

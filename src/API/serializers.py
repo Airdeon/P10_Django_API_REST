@@ -43,6 +43,11 @@ class IssuesSerializer(serializers.ModelSerializer):
             "created_time",
         ]
 
+    def validate(self, data, **kwargs):
+        data["project"] = self.context["project"]
+        data["author"] = self.context["author"]
+        return data
+
 
 class CommentsSerializer(serializers.ModelSerializer):
     issue = serializers.StringRelatedField()

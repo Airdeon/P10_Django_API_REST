@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
-from API.views import ProjectsViewSet
+from API.views import ProjectsViewSet, IssuesViewSet
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from Accounts.views import Signup, UserViewSet
 from rest_framework_nested import routers
@@ -27,8 +27,11 @@ router = routers.SimpleRouter()
 # router.register("signup", ViewSetSignup, basename="signup")
 router.register(r"projects", ProjectsViewSet, basename="projects")
 
-domains_router = routers.NestedSimpleRouter(router, r"projects", lookup="projects")
-domains_router.register(r"users", UserViewSet, basename="project-users")
+users_router = routers.NestedSimpleRouter(router, r"projects", lookup="projects")
+users_router.register(r"users", UserViewSet, basename="project-users")
+
+issues_router = routers.NestedSimpleRouter(router, r"projects", lookup="projects")
+issues_router.register(r"issues", IssuesViewSet, basename="project-issues")
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -36,6 +39,7 @@ urlpatterns = [
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path(r"", include(router.urls)),
-    path(r"", include(domains_router.urls)),
+    path(r"", include(users_router.urls)),
+    path(r"", include(issues_router.urls)),
     path("signup/", Signup.as_view(), name="signup"),
 ]

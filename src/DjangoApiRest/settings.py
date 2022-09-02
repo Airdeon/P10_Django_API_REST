@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 from pathlib import Path
 import datetime
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -141,4 +142,14 @@ JWT_AUTH = {
     # this is the maximum time AFTER the token was issued that
     # it can be refreshed.  exprired tokens can't be refreshed.
     "JWT_REFRESH_EXPIRATION_DELTA": datetime.timedelta(days=7),
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=10),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=20),
+    "ROTATE_REFRESH_TOKENS": False,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "SLIDING_TOKEN_REFRESH_EXP_CLAIM": "refresh_exp",
+    "SLIDING_TOKEN_LIFETIME": timedelta(days=10),
+    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=20),
 }

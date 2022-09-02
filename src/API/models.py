@@ -9,6 +9,9 @@ class Projects(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, null=True, verbose_name="Auteur")
     contributor = models.ManyToManyField(User, related_name="project_contributor", verbose_name="Contributeur")
 
+    def __str__(self):
+        return self.title
+
 
 class Issues(models.Model):
     project = models.ForeignKey(Projects, on_delete=models.CASCADE, null=True, verbose_name="Projet")
@@ -20,6 +23,9 @@ class Issues(models.Model):
     priority = models.CharField(max_length=50, verbose_name="Priorité")
     status = models.CharField(max_length=50, verbose_name="status")
     created_time = models.DateTimeField(auto_now_add=True, verbose_name="Date de création")
+
+    def __str__(self):
+        return self.title
 
 
 class Comments(models.Model):

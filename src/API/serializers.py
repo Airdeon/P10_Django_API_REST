@@ -62,3 +62,8 @@ class CommentsSerializer(serializers.ModelSerializer):
             "description",
             "created_time",
         ]
+
+    def validate(self, data, **kwargs):
+        data["issue"] = self.context["issue"]
+        data["author"] = self.context["author"]
+        return data

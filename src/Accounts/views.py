@@ -35,3 +35,12 @@ class UserViewSet(ModelViewSet):
         print(data)
         serializer = ProjectUserSerializer(project)
         return Response(serializer.data)
+
+    def delete(self, request, *args, **kwargs):
+        data = request.data
+        project = Projects.objects.get(id=self.kwargs["projects_pk"])
+        project.contributor.remove(User.objects.get(username=data["username"]))
+        print("ModelViewSet")
+        print(data)
+        serializer = ProjectUserSerializer(project)
+        return Response(serializer.data)

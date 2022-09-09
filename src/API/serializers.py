@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Projects, Issues, Comments
 from Accounts.serializers import ProjectUserSerializer
+from django.contrib.auth.models import User
 
 
 class ProjectsSerializer(serializers.ModelSerializer):
@@ -21,6 +22,14 @@ class ProjectsSerializer(serializers.ModelSerializer):
     def validate(self, data, **kwargs):
         data["author"] = self.context["author"]
         return data
+
+
+class ContributorSerializer(serializers.ModelSerializer):
+    contributor = serializers.StringRelatedField(many=True)
+
+    class Meta:
+        model = Projects
+        fields = ("contributor",)
 
 
 class IssuesSerializer(serializers.ModelSerializer):

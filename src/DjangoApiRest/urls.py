@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
-from API.views import ProjectsViewSet, IssuesViewSet, CommentsViewSet
+from API.views import ProjectsViewSet, IssuesViewSet, CommentsViewSet, ContributorViewset
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from Accounts.views import Signup, UserViewSet
 from rest_framework_nested import routers
@@ -28,7 +28,7 @@ router = routers.SimpleRouter()
 router.register(r"projects", ProjectsViewSet, basename="projects")
 
 users_router = routers.NestedSimpleRouter(router, r"projects", lookup="projects")
-users_router.register(r"users", UserViewSet, basename="project-users")
+users_router.register(r"users", ContributorViewset, basename="project-users")
 
 issues_router = routers.NestedSimpleRouter(router, r"projects", lookup="projects")
 issues_router.register(r"issues", IssuesViewSet, basename="project-issues")

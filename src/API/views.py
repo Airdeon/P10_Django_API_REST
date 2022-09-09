@@ -1,7 +1,9 @@
 import re
 from django.shortcuts import render
+from django.contrib.auth.models import User
 from .models import Projects, Issues, Comments
-from .serializers import ProjectsSerializer, IssuesSerializer, CommentsSerializer
+from .serializers import ProjectsSerializer, IssuesSerializer, CommentsSerializer, ContributorSerializer
+from .permissions import ProjectPermission, IssuePermission, CommentPermission
 
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
@@ -16,7 +18,7 @@ from rest_framework import status
 class ProjectsViewSet(ModelViewSet):
 
     serializer_class = ProjectsSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (ProjectPermission,)
 
     def get_queryset(self):
         print(self.kwargs)
@@ -34,9 +36,42 @@ class ProjectsViewSet(ModelViewSet):
         return context
 
 
+class ContributorViewset(ModelViewSet):
+    serializer_class = ContributorSerializer
+    permission_classes = (ProjectPermission,)
+
+    def get_queryset(self):
+        print(self.kwargs)
+
+        if "pk" in self.kwargs:
+            print(int(self.kwargs["pk"]))
+            return Projects.objects.filter(id=int(self.kwargs["pk"]))
+        else:
+            print(self.request.user)
+            return Projects.objects.filter(Q(author=self.request.user) | Q(contributor__in=[self.request.user]))
+
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        project = Projects.objects.get(id=self.kwargs["projects_pk"])
+        project.contributor.add(User.objects.get(username=data["username"]))
+        print("ModelViewSet")
+        print(data)
+        serializer = ContributorSerializer(project)
+        return Response(serializer.data)
+
+    def delete(self, request, *args, **kwargs):
+        data = request.data
+        project = Projects.objects.get(id=self.kwargs["projects_pk"])
+        project.contributor.remove(User.objects.get(username=data["username"]))
+        print("ModelViewSet")
+        print(data)
+        serializer = ContributorSerializer(project)
+        return Response(serializer.data)
+
+
 class IssuesViewSet(ModelViewSet):
     serializer_class = IssuesSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IssuePermission,)
 
     def get_queryset(self):
         print(self.kwargs)
@@ -57,7 +92,7 @@ class IssuesViewSet(ModelViewSet):
 
 class CommentsViewSet(ModelViewSet):
     serializer_class = CommentsSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (CommentPermission,)
 
     def get_queryset(self):
         print(self.kwargs)

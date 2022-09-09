@@ -19,9 +19,18 @@ class Issues(models.Model):
     contributor = models.ManyToManyField(User, related_name="issue_contributor", verbose_name="Contributeur")
     title = models.CharField(max_length=255, verbose_name="Titre")
     description = models.CharField(max_length=2000, verbose_name="Description")
-    tag = models.CharField(max_length=50, verbose_name="Tag")
-    priority = models.CharField(max_length=50, verbose_name="Priorité")
-    status = models.CharField(max_length=50, verbose_name="status")
+    tag = models.CharField(
+        choices=[(1, "BUG"), (2, "AMÉLIORATION"), (3, "TÂCHE")], default="BUG", max_length=50, verbose_name="Tag"
+    )
+    priority = models.CharField(
+        choices=[(1, "FAIBLE"), (2, "MOYENNE"), (3, "ÉLEVÉE")], default="FAIBLE", max_length=50, verbose_name="Priorité"
+    )
+    status = models.CharField(
+        choices=[(1, "À faire"), (2, "En cours"), (3, "Terminé")],
+        default="À faire",
+        max_length=50,
+        verbose_name="status",
+    )
     created_time = models.DateTimeField(auto_now_add=True, verbose_name="Date de création")
 
     def __str__(self):

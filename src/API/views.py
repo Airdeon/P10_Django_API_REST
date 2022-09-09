@@ -38,35 +38,41 @@ class ProjectsViewSet(ModelViewSet):
 
 class ContributorViewset(ModelViewSet):
     serializer_class = ContributorSerializer
-    permission_classes = (ProjectPermission,)
+    # permission_classes = (ProjectPermission,)
 
     def get_queryset(self):
         print(self.kwargs)
 
-        if "pk" in self.kwargs:
-            print(int(self.kwargs["pk"]))
-            return Projects.objects.filter(id=int(self.kwargs["pk"]))
-        else:
-            print(self.request.user)
-            return Projects.objects.filter(Q(author=self.request.user) | Q(contributor__in=[self.request.user]))
+        if "projects_pk" in self.kwargs:
+            print("projects_pk")
+            print(int(self.kwargs["projects_pk"]))
+            if "pk" in self.kwargs:
+                return Projects.objects.get(id=int(self.kwargs["projects_pk"])).contributor
+            return Projects.objects.filter(id=int(self.kwargs["projects_pk"]))
 
     def create(self, request, *args, **kwargs):
         data = request.data
         project = Projects.objects.get(id=self.kwargs["projects_pk"])
         project.contributor.add(User.objects.get(username=data["username"]))
-        print("ModelViewSet")
+        print("ModelViewSet create")
         print(data)
         serializer = ContributorSerializer(project)
         return Response(serializer.data)
 
-    def delete(self, request, *args, **kwargs):
-        data = request.data
-        project = Projects.objects.get(id=self.kwargs["projects_pk"])
-        project.contributor.remove(User.objects.get(username=data["username"]))
-        print("ModelViewSet")
+    def destroy(self, request, *args, **kwargs):
+        data = self.get_object()
+        print("del")
         print(data)
-        serializer = ContributorSerializer(project)
-        return Response(serializer.data)
+        Projects.objects.get(id=self.kwargs["projects_pk"]).contributor.remove(data)
+        # data.contributor.remove(User.objects.get(id=self.kwargs["pk"]))
+        print("done")
+        # project = Projects.objects.get(id=self.kwargs["projects_pk"])
+        # project.contributor.remove(User.objects.get(id=self.kwargs["pk"]))
+        print("ModelViewSet del")
+        print(data)
+        # serializer = ContributorSerializer(project)
+        # return Response(serializer.data)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class IssuesViewSet(ModelViewSet):

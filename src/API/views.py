@@ -1,5 +1,3 @@
-import re
-from django.shortcuts import render
 from django.contrib.auth.models import User
 from .models import Projects, Issues, Comments
 from .serializers import ProjectsSerializer, IssuesSerializer, CommentsSerializer, ContributorSerializer
@@ -12,6 +10,8 @@ from django.db.models import Q
 
 from rest_framework.response import Response
 from rest_framework import status
+
+from django.http import Http404
 
 
 # Create your views here.
@@ -80,7 +80,11 @@ class IssuesViewSet(ModelViewSet):
 
         if "pk" in self.kwargs:
             print(int(self.kwargs["pk"]))
-            return Issues.objects.filter(id=int(self.kwargs["pk"]))
+            try:
+                issue = Issues.objects.filter(id=int(self.kwargs["pk"]))
+                return issue
+            except:
+                raise Http404("Probleme introuvable")
         else:
             print(self.request.user)
             return Issues.objects.filter(project=Projects.objects.get(id=int(self.kwargs["projects_pk"])))

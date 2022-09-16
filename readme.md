@@ -1,6 +1,6 @@
 # P10 Créez une API sécurisée RESTful en utilisant Django REST
 
-### Api securisé de suivi de projets-problemes-commentaires
+### API securisé de suivi de projets-problemes-commentaires
 
 #### version de python 3.10.4
 
@@ -30,7 +30,7 @@ Installer les dépendances :
 pip install -r src/requirements.txt
 ```
 ### Lancement
-démaré ensuite le site en utilisant les commandes suivantes :
+démaré ensuite l'API en utilisant les commandes suivantes :
 ```
 cd src/
 python manage.py runserver
@@ -39,5 +39,5 @@ python manage.py runserver
 
 plus d'information sur la documentation postman à l'adresse suivante :
 
-http://127.0.0.1:8000/
+
 

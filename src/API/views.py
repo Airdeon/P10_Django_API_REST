@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.contrib.auth.models import User
 from .models import Projects, Issues, Comments
 from .serializers import ProjectsSerializer, IssuesSerializer, CommentsSerializer, ContributorSerializer
-from .permissions import ProjectPermission, IssuePermission, CommentPermission
+from .permissions import ProjectPermission, IssuePermission, CommentPermission, ProjectUserPermission
 
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
@@ -28,7 +28,14 @@ class ProjectsViewSet(ModelViewSet):
             return Projects.objects.filter(id=int(self.kwargs["pk"]))
         else:
             print(self.request.user)
-            return Projects.objects.filter(Q(author=self.request.user) | Q(contributor__in=[self.request.user]))
+            projects = Projects.objects.filter(Q(author=self.request.user) | Q(contributor=self.request.user))
+            print(projects)
+            list_project = []
+            for project in projects:
+                if project not in list_project:
+                    list_project.append(project)
+            print(list_project)
+            return list_project
 
     def get_serializer_context(self):
         context = super(ProjectsViewSet, self).get_serializer_context()
@@ -38,41 +45,30 @@ class ProjectsViewSet(ModelViewSet):
 
 class ContributorViewset(ModelViewSet):
     serializer_class = ContributorSerializer
-    # permission_classes = (ProjectPermission,)
+    permission_classes = (ProjectUserPermission,)
 
     def get_queryset(self):
-        print(self.kwargs)
-
-        if "projects_pk" in self.kwargs:
-            print("projects_pk")
-            print(int(self.kwargs["projects_pk"]))
-            if "pk" in self.kwargs:
-                return Projects.objects.get(id=int(self.kwargs["projects_pk"])).contributor
-            return Projects.objects.filter(id=int(self.kwargs["projects_pk"]))
+        project = Projects.objects.filter(id=int(self.kwargs["projects_pk"]))
+        print(project)
+        return project
 
     def create(self, request, *args, **kwargs):
+        """Add user to a project (new contributor)"""
         data = request.data
         project = Projects.objects.get(id=self.kwargs["projects_pk"])
+        self.check_object_permissions(self.request, project)
         project.contributor.add(User.objects.get(username=data["username"]))
-        print("ModelViewSet create")
-        print(data)
         serializer = ContributorSerializer(project)
         return Response(serializer.data)
 
     def destroy(self, request, *args, **kwargs):
-        data = self.get_object()
-        print("del")
-        print(data)
-        Projects.objects.get(id=self.kwargs["projects_pk"]).contributor.remove(data)
-        # data.contributor.remove(User.objects.get(id=self.kwargs["pk"]))
-        print("done")
-        # project = Projects.objects.get(id=self.kwargs["projects_pk"])
-        # project.contributor.remove(User.objects.get(id=self.kwargs["pk"]))
-        print("ModelViewSet del")
-        print(data)
-        # serializer = ContributorSerializer(project)
-        # return Response(serializer.data)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        """Remove user from project (remove contributor)"""
+        user = User.objects.get(id=self.kwargs["pk"])
+        project = Projects.objects.get(id=self.kwargs["projects_pk"])
+        self.check_object_permissions(self.request, project)
+        project.contributor.remove(user)
+        serializer = ContributorSerializer(project)
+        return Response(serializer.data)
 
 
 class IssuesViewSet(ModelViewSet):

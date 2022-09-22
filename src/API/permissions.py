@@ -1,5 +1,6 @@
 from rest_framework.permissions import BasePermission
-from API.models import Projects
+from API.models import Projects, Issues
+from django.http import Http404
 
 
 class ProjectPermission(BasePermission):
@@ -36,7 +37,10 @@ class ProjectUserPermission(BasePermission):
     def has_permission(self, request, view):
         # Ne donnons l’accès qu’aux utilisateurs authentifiés autheur ou contributeur du projet
         print("has_perm")
-        project = Projects.objects.get(id=view.kwargs["projects_pk"])
+        try:
+            project = Projects.objects.get(id=view.kwargs["projects_pk"])
+        except Projects.DoesNotExist:
+            raise Http404("Projet introuvable")
         if request.user and request.user.is_authenticated:
             if request.user == project.author or request.user in project.contributor.all():
                 return True
@@ -59,17 +63,21 @@ class IssuePermission(BasePermission):
 
     def has_permission(self, request, view):
         # Ne donnons l’accès qu’aux utilisateurs authentifiés autheur ou contributeur du projet
-        project = Projects.objects.get(id=view.kwargs["projects_pk"])
+        try:
+            project = Projects.objects.get(id=view.kwargs["projects_pk"])
+        except Projects.DoesNotExist:
+            raise Http404("Projet introuvable")
         if request.user and request.user.is_authenticated:
             if request.user == project.author or request.user in project.contributor.all():
                 return True
         return False
 
     def has_object_permission(self, request, view, obj):
+        print(obj.project.contributor.all())
         if request.method == "POST":
-            return bool(obj.project.author == request.user or request.user in obj.project.contributor)
+            return bool(obj.project.author == request.user or request.user in obj.project.contributor.all())
         elif request.method == "GET":
-            return bool(obj.author == request.user or request.user in obj.project.contributor)
+            return bool(obj.author == request.user or request.user in obj.project.contributor.all())
         elif request.method == "PUT" or request.method == "DELETE":
             return bool(obj.author == request.user)
         else:
@@ -81,7 +89,16 @@ class CommentPermission(BasePermission):
 
     def has_permission(self, request, view):
         # Ne donnons l’accès qu’aux utilisateurs authentifiés autheur ou contributeur du projet
-        project = Projects.objects.get(id=view.kwargs["projects_pk"])
+        try:
+            project = Projects.objects.get(id=view.kwargs["projects_pk"])
+
+        except Projects.DoesNotExist:
+            raise Http404("Introuvable")
+        try:
+            Issues.objects.get(id=view.kwargs["issues_pk"])
+        except Issues.DoesNotExist:
+            raise Http404("Introuvable")
+
         if request.user and request.user.is_authenticated:
             if request.user == project.author or request.user in project.contributor.all():
                 return True
@@ -89,9 +106,9 @@ class CommentPermission(BasePermission):
 
     def has_object_permission(self, request, view, obj):
         if request.method == "POST":
-            return bool(obj.issue.project.author == request.user or request.user in obj.issue.project.contributor)
+            return bool(obj.issue.project.author == request.user or request.user in obj.issue.project.contributor.all())
         elif request.method == "GET":
-            return bool(obj.author == request.user or request.user in obj.issue.project.contributor)
+            return bool(obj.author == request.user or request.user in obj.issue.project.contributor.all())
         elif request.method == "PUT" or request.method == "DELETE":
             return bool(obj.author == request.user)
         else:

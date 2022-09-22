@@ -1,7 +1,5 @@
 from rest_framework import serializers
 from .models import Projects, Issues, Comments
-from Accounts.serializers import ProjectUserSerializer
-from django.contrib.auth.models import User
 
 
 class ProjectsSerializer(serializers.ModelSerializer):

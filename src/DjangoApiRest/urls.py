@@ -15,10 +15,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework import routers
 from API.views import ProjectsViewSet, IssuesViewSet, CommentsViewSet, ContributorViewset
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from Accounts.views import Signup, UserViewSet
+from Accounts.views import Signup
 from rest_framework_nested import routers
 
 # API URL

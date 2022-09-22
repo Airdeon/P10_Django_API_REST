@@ -2,16 +2,9 @@ from django.contrib.auth.models import User
 from .models import Projects, Issues, Comments
 from .serializers import ProjectsSerializer, IssuesSerializer, CommentsSerializer, ContributorSerializer
 from .permissions import ProjectPermission, IssuePermission, CommentPermission, ProjectUserPermission
-
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import IsAuthenticated
-
 from django.db.models import Q
-
 from rest_framework.response import Response
-from rest_framework import status
-
-from django.http import Http404
 
 
 # Create your views here.
@@ -21,20 +14,14 @@ class ProjectsViewSet(ModelViewSet):
     permission_classes = (ProjectPermission,)
 
     def get_queryset(self):
-        print(self.kwargs)
-
         if "pk" in self.kwargs:
-            print(int(self.kwargs["pk"]))
             return Projects.objects.filter(id=int(self.kwargs["pk"]))
         else:
-            print(self.request.user)
             projects = Projects.objects.filter(Q(author=self.request.user) | Q(contributor=self.request.user))
-            print(projects)
             list_project = []
             for project in projects:
                 if project not in list_project:
                     list_project.append(project)
-            print(list_project)
             return list_project
 
     def get_serializer_context(self):
@@ -49,7 +36,6 @@ class ContributorViewset(ModelViewSet):
 
     def get_queryset(self):
         project = Projects.objects.filter(id=int(self.kwargs["projects_pk"]))
-        print(project)
         return project
 
     def create(self, request, *args, **kwargs):
@@ -76,17 +62,9 @@ class IssuesViewSet(ModelViewSet):
     permission_classes = (IssuePermission,)
 
     def get_queryset(self):
-        print(self.kwargs)
-
         if "pk" in self.kwargs:
-            print(int(self.kwargs["pk"]))
-            try:
-                issue = Issues.objects.filter(id=int(self.kwargs["pk"]))
-                return issue
-            except:
-                raise Http404("Probleme introuvable")
+            return Issues.objects.filter(id=int(self.kwargs["pk"]))
         else:
-            print(self.request.user)
             return Issues.objects.filter(project=Projects.objects.get(id=int(self.kwargs["projects_pk"])))
 
     def get_serializer_context(self):
@@ -101,14 +79,10 @@ class CommentsViewSet(ModelViewSet):
     permission_classes = (CommentPermission,)
 
     def get_queryset(self):
-        print(self.kwargs)
-
         if "pk" in self.kwargs:
-            print(int(self.kwargs["pk"]))
             return Comments.objects.filter(id=int(self.kwargs["pk"]))
         else:
-            print(self.request.user)
-            return Comments.objects.filter(issue=Issues.objects.get(id=int(self.kwargs["issues_pk"])))
+            return Comments.objects.filter(issue=Issues.objects.get(id=self.kwargs["issues_pk"]))
 
     def get_serializer_context(self):
         context = super(CommentsViewSet, self).get_serializer_context()

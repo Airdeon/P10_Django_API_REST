@@ -39,5 +39,5 @@ python manage.py runserver
 
 plus d'information sur la documentation postman à l'adresse suivante :
 
-
+https://documenter.getpostman.com/view/20392149/2s7ZE7L4FZ
 

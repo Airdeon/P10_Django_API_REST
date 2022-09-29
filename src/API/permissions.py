@@ -62,7 +62,7 @@ class IssuePermission(BasePermission):
     message = "Vous n'avez pas les droits pour cela !"
 
     def has_permission(self, request, view):
-        # Ne donnons l’accès qu’aux utilisateurs authentifiés autheur ou contributeur du projet
+        # Ne donnons l’accès qu’aux utilisateurs authentifiés auteur ou contributeur du projet
         try:
             project = Projects.objects.get(id=view.kwargs["projects_pk"])
         except Projects.DoesNotExist:
@@ -88,7 +88,7 @@ class CommentPermission(BasePermission):
     message = "Vous n'avez pas les droits pour cela !"
 
     def has_permission(self, request, view):
-        # Ne donnons l’accès qu’aux utilisateurs authentifiés autheur ou contributeur du projet
+        # Ne donnons l’accès qu’aux utilisateurs authentifiés auteur ou contributeur du projet
         try:
             project = Projects.objects.get(id=view.kwargs["projects_pk"])
 

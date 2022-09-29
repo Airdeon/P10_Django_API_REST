@@ -8,19 +8,15 @@ class ProjectPermission(BasePermission):
 
     def has_permission(self, request, view):
         # Ne donnons l’accès qu’aux utilisateurs authentifiés
-        print("has_perm")
         return bool(request.user and request.user.is_authenticated)
 
     def has_object_permission(self, request, view, obj):
-        print("obj perm")
         # permet la creation de projets a tous utilisateur authentifiés
         if request.method == "POST":
             return True
 
         # Permet a tous contributeur ou autheur de voir leur projets
         elif request.method == "GET":
-            print("get")
-            print(obj.contributor)
             return bool(obj.author == request.user or request.user in obj.contributor.all())
 
         # Authorise la modification et la suppression qu'au autheur du project
@@ -36,7 +32,6 @@ class ProjectUserPermission(BasePermission):
 
     def has_permission(self, request, view):
         # Ne donnons l’accès qu’aux utilisateurs authentifiés autheur ou contributeur du projet
-        print("has_perm")
         try:
             project = Projects.objects.get(id=view.kwargs["projects_pk"])
         except Projects.DoesNotExist:
@@ -47,12 +42,9 @@ class ProjectUserPermission(BasePermission):
         return False
 
     def has_object_permission(self, request, view, obj):
-        print("obj perm")
         if request.method == "GET":
-            print("get")
             return True
         elif request.method in ["POST", "PUT", "DELETE"]:
-            print("post")
             return bool(obj.author == request.user)
         else:
             return False
@@ -73,7 +65,6 @@ class IssuePermission(BasePermission):
         return False
 
     def has_object_permission(self, request, view, obj):
-        print(obj.project.contributor.all())
         if request.method == "POST":
             return bool(obj.project.author == request.user or request.user in obj.project.contributor.all())
         elif request.method == "GET":

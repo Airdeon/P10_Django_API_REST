@@ -5,6 +5,7 @@ from .permissions import ProjectPermission, IssuePermission, CommentPermission, 
 from rest_framework.viewsets import ModelViewSet
 from django.db.models import Q
 from rest_framework.response import Response
+from django.http import Http404
 
 
 # Create your views here.
@@ -15,7 +16,11 @@ class ProjectsViewSet(ModelViewSet):
 
     def get_queryset(self):
         if "pk" in self.kwargs:
-            return Projects.objects.filter(id=int(self.kwargs["pk"]))
+            try:
+                project = Projects.objects.filter(id=int(self.kwargs["pk"]))
+                return project
+            except ValueError:
+                raise Http404("Numéro de projet invalide")
         else:
             projects = Projects.objects.filter(Q(author=self.request.user) | Q(contributor=self.request.user))
             list_project = []
@@ -35,8 +40,11 @@ class ContributorViewset(ModelViewSet):
     permission_classes = (ProjectUserPermission,)
 
     def get_queryset(self):
-        project = Projects.objects.filter(id=int(self.kwargs["projects_pk"]))
-        return project
+        try:
+            project = Projects.objects.filter(id=int(self.kwargs["projects_pk"]))
+            return project
+        except ValueError:
+            raise Http404("Numéro de projet invalide")
 
     def create(self, request, *args, **kwargs):
         """Add user to a project (new contributor)"""

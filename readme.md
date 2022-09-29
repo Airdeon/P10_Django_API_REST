@@ -33,6 +33,7 @@ pip install -r src/requirements.txt
 démaré ensuite l'API en utilisant les commandes suivantes :
 ```
 cd src/
+python manage.py migrate
 python manage.py runserver
 ```
 ## vous pouvez ensuite utilisé les endpoints suivants :
